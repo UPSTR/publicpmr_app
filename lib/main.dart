@@ -1,34 +1,82 @@
-import 'dart:async';
-import 'dart:convert';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:publicpmr_app/bodegaPage.dart';
-import 'package:publicpmr_app/powerPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(new MyApp());
 
 String username = '';
-String token = '';
-List litems = [];
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Login PHP My Admin',
+      title: 'PublicPMR',
+      theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFF333333)),
       home: new MyHomePage(),
       routes: <String, WidgetBuilder>{
-        '/powerPage': (BuildContext context) => new SuperV(
-              username: username,
-            ),
-        '/bodegaPage': (BuildContext context) => new BodegaPage(
-              username: username,
-            ),
         '/MyHomePage': (BuildContext context) => new MyHomePage(),
       },
     );
+  }
+}
+
+class Choice {
+  const Choice({this.title, this.icon, this.color});
+
+  final String title;
+  final IconData icon;
+  final Color color;
+}
+
+const List<Choice> choices = const <Choice>[
+  const Choice(
+      title: 'ТАКСИ', icon: Icons.directions_car, color: Colors.yellow),
+  const Choice(
+      title: 'КУРС ВАЛЮТ', icon: Icons.directions_bike, color: Colors.green),
+  const Choice(
+      title: 'ТЕЛЕФОНЫ', icon: Icons.directions_boat, color: Colors.red),
+  const Choice(title: 'КИНО', icon: Icons.directions_bus, color: Colors.blue),
+];
+
+class ChoiceCard extends StatelessWidget {
+  const ChoiceCard({Key key, this.choice}) : super(key: key);
+  final Choice choice;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: ButtonTheme(
+                minWidth: double.infinity,
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                      side: BorderSide(color: Color.fromARGB(0, 0, 0, 0))),
+                  onPressed: () => {},
+                  color: choice.color,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        choice.icon,
+                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                        size: 32,
+                      ),
+                      Text(choice.title)
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]);
   }
 }
 
@@ -38,107 +86,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController user = new TextEditingController();
-  TextEditingController pass = new TextEditingController();
-
-  String msg = '';
-
-  Future<String> _login() async {
-    Map data = {"password": user.text, "username": pass.text};
-
-    var url = 'https://publicpmr.herokuapp.com/api/authenticate';
-    final response = await http.post(url, body: json.encode(data), headers: {
-      "accept": "application/json",
-      "content-type": "application/json"
-    }).then((response) {
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-      token = json.decode(response.body)['id_token'];
-      print(json.decode(response.body)['id_token']);
-    });
-
-    print(user.text);
-    print(pass.text);
-    print(response);
-
-    msg = "Login success";
-
-    return "Login success";
-  }
-
-  Future<String> _taxi() async {
-    var url = 'https://publicpmr.herokuapp.com/api/taxis';
-    final response = await http.get(url, headers: {
-      "accept": "application/json",
-      "content-type": "application/json",
-      "Authorization": "Bearer $token"
-    }).then((response) {
-      print("Bearer $token");
-      print(litems);
-    });
-
-    return "Taxi success";
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
-      body: Container(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Text(
-                "Username",
-                style: TextStyle(fontSize: 18.0),
-              ),
-              TextField(
-                controller: user,
-                decoration: InputDecoration(hintText: 'Username'),
-              ),
-              Text(
-                "Password",
-                style: TextStyle(fontSize: 18.0),
-              ),
-              TextField(
-                controller: pass,
-                obscureText: true,
-                decoration: InputDecoration(hintText: 'Password'),
-              ),
-              RaisedButton(
-                child: Text("Login"),
-                onPressed: () {
-                  _login();
-//                  Navigator.pop(context);
-                },
-              ),
-              RaisedButton(
-                child: Text("Taxi"),
-                onPressed: () {
-                  _taxi();
-//                  Navigator.pop(context);
-                },
-              ),
-              Text(
-                msg,
-                style: TextStyle(fontSize: 20.0, color: Colors.red),
-              ),
-              RaisedButton(
-                child: Text('Open route'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BodegaPage()),
-                  );
-                },
-              ),
-            ],
-          ),
+        appBar: new AppBar(
+          title: new Text('PublicPMR'),
+          backgroundColor: Colors.black45,
         ),
-      ),
-
-    );
+        body: GridView.count(
+            crossAxisCount: 2,
+            padding: EdgeInsets.all(15.0),
+            children: List.generate(choices.length, (index) {
+              return Center(
+                child: ChoiceCard(choice: choices[index]),
+              );
+            })));
   }
 }
