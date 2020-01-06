@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:publicpmr_app/http_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:convert';
+
+import 'User.dart';
 
 void main() => runApp(new MyApp());
 
@@ -15,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFF333333)),
       home: new MyHomePage(),
       routes: <String, WidgetBuilder>{
-        '/MyHomePage': (BuildContext context) => new MyHomePage(),
+        '/home': (BuildContext context) => new MyHomePage(),
       },
     );
   }
@@ -86,6 +90,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,12 +99,24 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.black45,
         ),
         body: GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: 1,
             padding: EdgeInsets.all(15.0),
-            children: List.generate(choices.length, (index) {
-              return Center(
-                child: ChoiceCard(choice: choices[index]),
-              );
-            })));
+            children: <Widget>[
+              GridView.count(
+                crossAxisCount: 2,
+                children: List.generate(choices.length, (index) {
+                  return Center(
+                    child: ChoiceCard(choice: choices[index]),
+                  );
+                }),
+              ),
+              Container(
+                child: Center(
+                  child: new Text('Version: 1.0.1'),
+                )
+              )
+            ]
+        )
+    );
   }
 }
