@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'PublicPMR',
           theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFF333333)),
+          initialRoute: '/',
           routes: routes,
         ),
       ),

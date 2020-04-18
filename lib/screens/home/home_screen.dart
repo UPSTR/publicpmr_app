@@ -2,21 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:publicpmr_app/providers/auth.dart';
-import 'package:publicpmr_app/screens/taxi/taxi_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
-
 }
-
-
 
 class _MyHomePageState extends State<HomeScreen> {
 
   SharedPreferences sharedPreferences;
-
   String token;
 
   // инициализируем стейт
@@ -37,12 +32,11 @@ class _MyHomePageState extends State<HomeScreen> {
     print(token);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final authData = Provider.of<Auth>(context, listen: false);
     return Scaffold(
+      backgroundColor: Colors.white24,
       appBar: new AppBar(
         title: new Text('PublicPMR'),
         backgroundColor: Colors.black45,
@@ -58,27 +52,23 @@ class _MyHomePageState extends State<HomeScreen> {
           ) :
           FlatButton(
             onPressed: () {},
+            child: Text(''),
           )
         ],
       ),
       body: GridView.count(
-          crossAxisCount: 1,
-          padding: EdgeInsets.all(15.0),
-          children: <Widget>[
-            GridView.count(
-              crossAxisCount: 2,
-              children: List.generate(choices.length, (index) {
-                return Center(
-                  child: ChoiceCard(choice: choices[index]),
-                );
-              }),
-            ),
-            Container(
-                child: Center(
-                  child: new Text('Version: 1.0.1'),
-                ))
-          ]),
-
+        primary: false,
+        padding: const EdgeInsets.all(5),
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
+        crossAxisCount: 2,
+        children: List.generate(choices.length, (index) {
+          return ChoiceCard(choices[index]);
+        }),
+//            children: <Widget>[
+//              for(var item in choices ) ChoiceCard(item)
+//            ]
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -134,25 +124,23 @@ class _MyHomePageState extends State<HomeScreen> {
 }
 
 class Choice {
-  const Choice({this.title, this.icon, this.color});
+  const Choice({this.title, this.icon, this.color, this.route});
 
   final String title;
   final IconData icon;
   final Color color;
+  final String route;
 }
 
 const List<Choice> choices = const <Choice>[
-  const Choice(
-      title: 'ТАКСИ', icon: Icons.directions_car, color: Colors.yellow),
-  const Choice(
-      title: 'КУРС ВАЛЮТ', icon: Icons.directions_bike, color: Colors.green),
-  const Choice(
-      title: 'ТЕЛЕФОНЫ', icon: Icons.directions_boat, color: Colors.red),
-  const Choice(title: 'КИНО', icon: Icons.directions_bus, color: Colors.blue),
+  const Choice(title: 'ТАКСИ', icon: Icons.directions_car, color: Colors.yellow, route: '/taxi'),
+  const Choice(title: 'КУРС ВАЛЮТ', icon: Icons.directions_bike, color: Colors.green, route: '/auth'),
+  const Choice(title: 'ТЕЛЕФОНЫ', icon: Icons.directions_boat, color: Colors.red, route: '/'),
+  const Choice(title: 'КИНО', icon: Icons.directions_bus, color: Colors.blue, route: '/'),
 ];
 
 class ChoiceCard extends StatelessWidget {
-  const ChoiceCard({Key key, this.choice}) : super(key: key);
+  const ChoiceCard(this.choice);
   final Choice choice;
 
   @override
@@ -171,20 +159,20 @@ class ChoiceCard extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(18.0),
                       side: BorderSide(color: Color.fromARGB(0, 0, 0, 0))),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TaxiScreen()),
-                    );
+                    Navigator.pushNamed(context, choice.route);
                   },
                   color: choice.color,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Icon(
-                        choice.icon,
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
-                        size: 32,
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Icon(
+                          choice.icon,
+                          color: Color.fromRGBO(0, 0, 0, 0.5),
+                          size: 42,
+                        ),
                       ),
                       Text(choice.title)
                     ],
